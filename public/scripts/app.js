@@ -57,7 +57,6 @@ function submitloginform() {
     });
     return false;
 }
-
 function logout(item) {
     firebase.auth().signOut();
     localStorage.clear();
@@ -136,6 +135,8 @@ function pageLoad(pg) {
         adPage();
     }else if (pg === "search") {
         search();
+    }else if (pg === "ad") {
+        showAd();
     }
 }
 function homepage() {
@@ -252,3 +253,13 @@ if ('serviceWorker' in navigator) {
 //Executing Code
 firebase.initializeApp(config);
 firebaseConfig();
+
+async function showAd(){
+    let id = locationVar('adid');
+    let data;
+    await db.collection('ads').doc(id).get().then(r=>{
+        console.log(r.data());
+        data=r.data();
+    });
+    console.log(data);
+}

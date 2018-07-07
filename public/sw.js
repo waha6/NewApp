@@ -2,13 +2,11 @@ const files = [
   "./",
   "./scripts/app.js",
   "./styles/style.css",
-  "./images/icon.png",
   "./manifest.json",
   "./assests/login.json",
   "./assests/submitads.json",
   "./scripts/signin-up.js",
   "./styles/signin-up.css",
-  "./images/user.svg",
   "./images/favorite.svg",
   "./images/icons/icon-72x72.png",
   "./images/icons/icon-96x96.png",
@@ -48,7 +46,7 @@ function precache() {
   });
 }
 async function fromCache(req) {
-  const cacheResponse = await caches.match((req.url.indexOf("/?page") != -1) ? new Request("./") : req);
+  const cacheResponse = await caches.match((req.url.indexOf("?page") != -1) ? new Request("./") : req);
   return cacheResponse || "Error";
 }
 
