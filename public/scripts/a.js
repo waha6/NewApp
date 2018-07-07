@@ -50,7 +50,6 @@ function submitloginform() {
     let pass = form.pass.value
     firebase.auth().signInWithEmailAndPassword(mail, pass).then(async (u) => {
         uzer = firebase.auth().currentUser;
-        debugger
         let uobj;
         if (u) {
             console.log('start')
@@ -287,34 +286,6 @@ firebase.initializeApp(config);
 firebaseConfig();
 
 function sendMessage(t) {
-    if (t.text.value != '') {
-        let m ={
-            senderid:uc().uid,
-            sendername:u().uname,
-            content:t.text.value,
-            adtitle:document.querySelector('.adBtitle>h1').innerHTML,
-            date:new Date(),
-            adid:document.querySelector('.adbox').id
-        }
-        console.log(m);
-    }
+    if (t.text.value != '') {}
     return !1
 }
-function cu(){
-    uzer=firebase.auth().currentUser;
-    return uzer;
-}
-// con = document.querySelector('.container')
-// <div class=​"container">​…​</div>​
-// con.innerHTML =''
-// ""
-// let n = 0;
-// undefined
-// db.collection("SIM").doc("mLEGc9NmaTtzVBQsIY57")
-//     .onSnapshot(function(doc) {
-//         var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-// 		let ar = doc.data().messages;
-//         console.log(source, " data: ", ar.toString());
-// 		for(n;n<ar.length;n++)
-// 			con.innerHTML += ar[n]+'<br>';
-//     });

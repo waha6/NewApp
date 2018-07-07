@@ -15,12 +15,16 @@ html{
 body, .container {
   width: 100%;
 }
+.container{
+  display: flex;
+  justify-content: center;
+}
 main{
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
 }
-.box{
+.box ,.adbox{
   background-color: #2965be;
   color: white;
   margin: 5px;
@@ -29,9 +33,25 @@ main{
   flex-direction: column;
   justify-content: space-between;
 }
-.box *{
-  overflow: hidden;
+.adbox{
+  background-color: #ffffff;
+    color: #7b7b7b;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.adBtitle{
+  text-align: justify;
+  font-size: 1.3em;
+  color: #2d2d2d;
+}
+.box *,.adbox *{
   padding: 2px;
+}
+.adbox div:nth-child(2){
+  display: flex;
+  flex-direction: column;
 }
 @media only screen and (min-width: 1200px) {
   main{
@@ -223,18 +243,51 @@ button#submit{
   display: flex;
   justify-content: flex-end;
 }
-.aduser{
+.aduser,.adBuser{
   justify-content: space-between;
   color: darkgray;
 }
 .aduser>div{
+  padding-left: 5px;
   flex-direction: column
+}
+.adBuser *{
+  padding: 20px;
+}
+.adBprice{
+  display: flex;
+  justify-content: flex-end;
 }
 .aduser div:last-child{
   color: lightgray;
 }
 .adimg{
   height: 63%;
+}
+.message-form textarea {
+  font-family: sans-serif;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.message-form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background: #2965be;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #FFFFFF;
+  font-size: 14px;
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
 }
 /* Safari */
 @-webkit-keyframes spin {

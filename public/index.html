@@ -30,7 +30,7 @@
             <a href="./?page=login" id="l-in">My Account</a>
             <a href="./?page=register" id="register">Register</a>
             <a >About</a>
-            <a href="javascript:window.open('','_self').close();">Exit</a>
+            <a href="javascript:window.open('', '_self').close();" onclick="window.history.back()">Exit</a>
     </div>
     <div class="container">
             <div class="man"><div class="loader"></div></div>
@@ -40,7 +40,7 @@
     <script>
     var page = locationVar("page") || "category";
     pageLoad(page);
-    if(localStorage.getItem('user')) document.querySelector("#l-out").style.display="block";
+    if(u()) document.querySelector("#l-out").style.display="block";
     else document.querySelector("#l-out").style.display="none";
     </script>
     </body>
