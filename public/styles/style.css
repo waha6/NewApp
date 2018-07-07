@@ -24,7 +24,7 @@ main{
   justify-content: flex-start;
   flex-wrap: wrap;
 }
-.box ,.adbox{
+.box ,.adbox ,.messageC{
   background-color: #2965be;
   color: white;
   margin: 5px;
@@ -288,6 +288,26 @@ button#submit{
   -webkit-transition: all 0.3 ease;
   transition: all 0.3 ease;
   cursor: pointer;
+}
+.flexC{
+  display: flex;
+  flex-direction: column;
+}
+.flex{
+  display: flex;
+}
+.messageC{
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 500px;
+}
+.messageC div:nth-child(3){
+  background-color: #2d5faa;
+  margin-top: 10px;
+  min-height: 100px;
+}
+.messageC *{
+  padding: 2px;
 }
 /* Safari */
 @-webkit-keyframes spin {

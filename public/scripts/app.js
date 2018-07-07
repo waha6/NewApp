@@ -50,15 +50,19 @@ function submitloginform() {
     let pass = form.pass.value
     firebase.auth().signInWithEmailAndPassword(mail, pass).then(async (u) => {
         uzer = firebase.auth().currentUser;
-        debugger
-        let uobj;
+        let uobj,mobj;
         if (u) {
             console.log('start')
             await db.collection('users').doc(uzer.displayName).get().then(r => {
                 uobj = r.data()
             })
+            await db.collection('SIM').doc(uobj.messageid).get().then(r => {
+                mobj = r.data()
+            })
             console.log(uobj)
             localStorage.setItem('user', JSON.stringify(uobj));
+            localStorage.setItem('SIM', JSON.stringify(mobj));
+            localStorage['no']=mobj.messages.length;
             console.log("finish")
         }
         form.reset();
@@ -124,7 +128,8 @@ function updateUser(c, id, name, value, type) {
         if (type == 'n')
             a = value;
         else a.push(value);
-        let j = JSON.parse(localStorage.user);
+        debugger
+        let j = JSON.parse(localStorage[c]||'{}');
         j[name] = a;
         localStorage[c] = JSON.stringify(j);
         data.update(JSON.parse(`{${JSON.stringify(name)}:${JSON.stringify(a)}}`))
@@ -146,6 +151,10 @@ function pageLoad(pg) {
         search();
     else if (pg === "ad")
         showAd();
+    else if (pg === "inbox")
+        inboxPage();
+    else if (pg === "replay")
+        replayPage();
 }
 
 function homepage() {
@@ -164,26 +173,19 @@ function submitcreateform() {
     let form = document.querySelector('.register-form');
     let mail = form.mail.value;
     let pass = form.pass.value
-    firebase.auth().createUserWithEmailAndPassword(mail, pass).then(user => {
+    firebase.auth().createUserWithEmailAndPassword(mail, pass).then(async user => {
         uzer = firebase.auth().currentUser;
+        let mid = await db.collection('SIM').add({messages:[]}).then(r => r.id);
         let uobj = {
             "adsid": [],
             "favoriteads": [],
-            "messages": {
-                "messages": {
-                    "messagecontent": [],
-                    "senderid": []
-                },
-                "sendmessages": {
-                    "messagecontent": [],
-                    "recieverid": []
-                }
-            },
+            "messageid": mid,
             "phonenumber": "+92" + form.phone.value,
             "uemail": uzer.email,
             "uid": uzer.uid,
             "uname": form.name.value
         };
+
         db.collection("users").add(uobj).then(async res => {
             uzer.updateProfile({
                 displayName: res.id
@@ -289,14 +291,17 @@ firebaseConfig();
 function sendMessage(t) {
     if (t.text.value != '') {
         let m ={
-            senderid:uc().uid,
+            senderid:cu().displayName,
             sendername:u().uname,
             content:t.text.value,
             adtitle:document.querySelector('.adBtitle>h1').innerHTML,
             date:new Date(),
             adid:document.querySelector('.adbox').id
         }
+        debugger
         console.log(m);
+        updateUser('SIM',u().messageid,'messages',m);
+        localStorage['no']=JSON.parse(localStorage['SIM']).messages.length;
     }
     return !1
 }
@@ -304,6 +309,40 @@ function cu(){
     uzer=firebase.auth().currentUser;
     return uzer;
 }
+async function inboxPage(){
+    let con = document.querySelector('.container');
+    let n=0;
+    await db.collection('SIM').doc(u().messageid).onSnapshot(function(doc) {
+        if(!con.querySelector('main'))
+            con.innerHTML = '<main><div class="messageBox flexC"></div></main>'
+        let m = con.querySelector('main div')
+       let ar = doc.data().messages;
+        console.log(" data: ", ar.toString());
+		for(n;n<ar.length;n++)
+			m.innerHTML = makemessage(n,ar[n])+m.innerHTML;
+    });
+}
+function replayPage(){
+    let con = document.querySelector('.container');
+    let n=locationVar('n');
+    let mid=locationVar('mid');
+    let v;
+    db.collection('SIM').doc(mid).get().then(r=>{
+        let content = r.data().messages[n];
+        con.innerHTML=`<main>
+        <script> var v=${JSON.stringify(content)}; v = JSON.parse(v);</script>
+        <div class="adbox">
+        <form onsubmit="return !1" class='message-form'>
+            <textarea name='text' rows='7' placeholder='Message replay'></textarea>
+            <button>Replay</button>
+        </form>
+        <div class="messageC flexC" ><div><h2>Message by: [ ${content.sendername}] ==> [ ${content.adtitle} ]</h2></div><div><h5>messageid: ${content.senderid}</h5></div><div><h2>${content.content}</h2></div><div class=''><h3>${content.date}</h3></div></div></div></main>`;
+    });
+}
+function makemessage(n,content){
+    return `<div class="messageC flexC" onclick="window.location.assign('./?page=replay&mid=${u().messageid}&n=${n}')"><div><h2>Message by: [ ${content.sendername}] ==> [ ${content.adtitle} ]</h2></div><div><h5>messageid: ${content.senderid}</h5></div><div><h2>${content.content}</h2></div><div class=''><h3>${content.date}</h3></div></div>`;
+}
+
 // con = document.querySelector('.container')
 // <div class=​"container">​…​</div>​
 // con.innerHTML =''

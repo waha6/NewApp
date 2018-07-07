@@ -26,8 +26,10 @@
     </div>
     <div id="nav" class="sidenav hide">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav(this.parentNode)" >&times;</a>
-            <a onclick="logout(this);" id="l-out">Sign Out</a>
+            <a onclick="logout(this);" id="l-out"  class="signin">Sign Out</a>
             <a href="./?page=login" id="l-in">My Account</a>
+            <a href="./?page=inbox" id="inbox" class="signin">Inbox</a>
+            <a href="./?page=favorite" id="favorite" class="signin">Favorite</a>
             <a href="./?page=register" id="register">Register</a>
             <a >About</a>
             <a href="javascript:window.open('', '_self').close();" onclick="window.history.back()">Exit</a>
@@ -40,8 +42,9 @@
     <script>
     var page = locationVar("page") || "category";
     pageLoad(page);
-    if(u()) document.querySelector("#l-out").style.display="block";
-    else document.querySelector("#l-out").style.display="none";
+    document.querySelectorAll(".signin").forEach(r => {
+        r.style.display=(u())?"block":"none";
+    });
     </script>
     </body>
 </html>
