@@ -17,7 +17,7 @@ function firebaseConfig() {
     firebase.firestore().enablePersistence();
     db = firebase.firestore();
     uzer = firebase.auth().currentUser;
-    u()
+    u();
 }
 
 function u() {
@@ -50,20 +50,17 @@ function submitloginform() {
     let pass = form.pass.value
     firebase.auth().signInWithEmailAndPassword(mail, pass).then(async (u) => {
         uzer = firebase.auth().currentUser;
-        let uobj,mobj;
+        let uobj, mobj;
         if (u) {
-            console.log('start')
             await db.collection('users').doc(uzer.displayName).get().then(r => {
                 uobj = r.data()
             })
             await db.collection('SIM').doc(uobj.messageid).get().then(r => {
                 mobj = r.data()
             })
-            console.log(uobj)
             localStorage.setItem('user', JSON.stringify(uobj));
             localStorage.setItem('SIM', JSON.stringify(mobj));
-            localStorage['no']=mobj.messages.length;
-            console.log("finish")
+            localStorage['no'] = mobj.messages.length;
         }
         form.reset();
         window.history.back();
@@ -77,7 +74,6 @@ function submitloginform() {
 function logout(item) {
     firebase.auth().signOut();
     localStorage.user = null;
-    item.style.display = "none";
     window.location.reload()
 }
 async function submitAd() {
@@ -91,9 +87,7 @@ async function submitAd() {
     }
 }
 async function submitPushAd() {
-    console.log("done");
     uzer = firebase.auth().currentUser;
-    let u = JSON.parse(u());
     let form = document.querySelector('.ads-form');
     let title = form.title.value;
     let cat = document.querySelector('#category').value;
@@ -104,17 +98,17 @@ async function submitPushAd() {
     let snap = await stored.put(form.pic.files[0]);
     let snapshot = await snap.ref.getDownloadURL().then(url => {
         img = url;
-        console.log(url)
     })
     db.collection('ads').add({
         "uid": uzer.displayName,
-        "uname": u.uname,
-        "phone": u.phonenumber,
+        "uname": u().uname,
+        "phone": user.phonenumber,
         "title": title,
         "category": cat,
         "description": descrip,
-        "phone": u.phonenumber,
+        "phone": user.phonenumber,
         "imageURL": img,
+        "date": new Date(),
         "price": "Rs:" + pric
     }).then(ad => {
         updateUser('users', uzer.displayName, "adsid", ad.id)
@@ -122,16 +116,17 @@ async function submitPushAd() {
     form.reset()
 }
 
-function updateUser(c, id, name, value, type) {
+function updateUser(c, id, name, value, type, re) {
     let data = db.collection(c).doc(id);
     data.get().then(r => r.data()).then(a => a[name]).then(a => {
         if (type == 'n')
             a = value;
         else a.push(value);
-        debugger
-        let j = JSON.parse(localStorage[c]||'{}');
-        j[name] = a;
-        localStorage[c] = JSON.stringify(j);
+        if (!re) {
+            let j = JSON.parse(localStorage[c] || '{}');
+            j[name] = a;
+            localStorage[c] = JSON.stringify(j);
+        }
         data.update(JSON.parse(`{${JSON.stringify(name)}:${JSON.stringify(a)}}`))
     })
 }
@@ -153,8 +148,10 @@ function pageLoad(pg) {
         showAd();
     else if (pg === "inbox")
         inboxPage();
-    else if (pg === "replay")
+    else if (pg === "replay") {
         replayPage();
+        v = ''
+    }
 }
 
 function homepage() {
@@ -175,7 +172,9 @@ function submitcreateform() {
     let pass = form.pass.value
     firebase.auth().createUserWithEmailAndPassword(mail, pass).then(async user => {
         uzer = firebase.auth().currentUser;
-        let mid = await db.collection('SIM').add({messages:[]}).then(r => r.id);
+        let mid = await db.collection('SIM').add({
+            messages: []
+        }).then(r => r.id);
         let uobj = {
             "adsid": [],
             "favoriteads": [],
@@ -191,6 +190,8 @@ function submitcreateform() {
                 displayName: res.id
             });
             localStorage.setItem("user", JSON.stringify(uobj));
+            localStorage['SIM'] = null;
+            localStorage['no'] = null;
             form.reset();
             window.location.assign("./?page=category")
         });
@@ -252,7 +253,6 @@ function search() {
             if (!con.querySelector('main'))
                 con.innerHTML = '<main></main>'
             let m = document.querySelector('main');
-            console.log(r);
             r.forEach(s => {
                 let d = s.data();
                 if (d.title.toLowerCase().indexOf(text.toLowerCase()) != -1)
@@ -276,6 +276,80 @@ function addFavorite(t) {
         updateUser('users', uzer.displayName, "favoriteads", t.id)
     }
 }
+
+function sendMessage(t) {
+    if (t.text.value != '') {
+        let m = {
+            senderid: cu().displayName,
+            sendername: u().uname,
+            content: t.text.value,
+            adtitle: document.querySelector('.adBtitle>h1').innerHTML,
+            date: new Date(),
+            adid: document.querySelector('.adbox').id
+        }
+        db.collection('users').doc(t.id).get().then(r => {
+            updateUser('SIM', r.data().messageid, 'messages', m, '', 1);
+        });
+    }
+    t.reset();
+    return !1
+}
+
+function sendReplay(t) {
+    if (t.text.value != '') {
+        let m = {
+            senderid: cu().displayName,
+            sendername: u().uname,
+            content: t.text.value,
+            adtitle: v.adtitle,
+            date: new Date(),
+            adid: v.adid
+        }
+        db.collection('users').doc(v.senderid).get().then(r => {
+            updateUser('SIM', r.data().messageid, 'messages', m, '', 1);
+        });
+    }
+    t.reset();
+    return !1
+}
+
+function cu() {
+    uzer = firebase.auth().currentUser;
+    return uzer;
+}
+async function inboxPage() {
+    let con = document.querySelector('.container');
+    let n = 0;
+    await db.collection('SIM').doc(u().messageid).onSnapshot(function (doc) {
+        if (!con.querySelector('main'))
+            con.innerHTML = '<main class="fc"><div class="messageBox flexC"></div></main>'
+        let m = con.querySelector('main div')
+        let ar = doc.data().messages;
+        for (n; n < ar.length; n++)
+            m.innerHTML = makemessage(n, ar[n]) + m.innerHTML;
+    });
+}
+
+function replayPage() {
+    let con = document.querySelector('.container');
+    let n = locationVar('n');
+    let mid = locationVar('mid');
+    db.collection('SIM').doc(mid).get().then(r => {
+        let content = r.data().messages[n];
+        v = content;
+        con.innerHTML = `<main class='fc'><div class="adbox"><form onsubmit="return sendReplay(this)" class="message-form"><textarea name="text" rows="7" placeholder="Message replay"></textarea><button>Replay</button></form><div class="messageC flexC"><div><h2>Message by: [ ${content.sendername}] ==> [ ${content.adtitle} ]</h2></div><div><h5>messageid: ${content.senderid}</h5></div><div><h2>${content.content}</h2></div><div class=""><h3>${content.date}</h3></div></div></div><main>
+        `;
+    });
+}
+
+function makemessage(n, content) {
+    return `<div class="messageC flexC" onclick="window.location.assign('./?page=replay&mid=${u().messageid}&n=${n}')"><div><h2>Message by: [ ${content.sendername}] ==> [ ${content.adtitle} ]</h2></div><div><h5>messageid: ${content.senderid}</h5></div><div><h2>${content.content}</h2></div><div class=''><h3>${content.date}</h3></div></div>`;
+}
+
+function loader() {
+    return '<div class="man"><div class="loader"></div></div>';
+}
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register("sw.js").then(function () {
         console.log('SW Registerd')
@@ -287,60 +361,29 @@ if ('serviceWorker' in navigator) {
 }
 firebase.initializeApp(config);
 firebaseConfig();
-
-function sendMessage(t) {
-    if (t.text.value != '') {
-        let m ={
-            senderid:cu().displayName,
-            sendername:u().uname,
-            content:t.text.value,
-            adtitle:document.querySelector('.adBtitle>h1').innerHTML,
-            date:new Date(),
-            adid:document.querySelector('.adbox').id
-        }
-        debugger
-        console.log(m);
-        updateUser('SIM',u().messageid,'messages',m);
-        localStorage['no']=JSON.parse(localStorage['SIM']).messages.length;
-    }
-    return !1
-}
-function cu(){
-    uzer=firebase.auth().currentUser;
-    return uzer;
-}
-async function inboxPage(){
-    let con = document.querySelector('.container');
-    let n=0;
-    await db.collection('SIM').doc(u().messageid).onSnapshot(function(doc) {
-        if(!con.querySelector('main'))
-            con.innerHTML = '<main><div class="messageBox flexC"></div></main>'
-        let m = con.querySelector('main div')
-       let ar = doc.data().messages;
-        console.log(" data: ", ar.toString());
-		for(n;n<ar.length;n++)
-			m.innerHTML = makemessage(n,ar[n])+m.innerHTML;
-    });
-}
-function replayPage(){
-    let con = document.querySelector('.container');
-    let n=locationVar('n');
-    let mid=locationVar('mid');
-    let v;
-    db.collection('SIM').doc(mid).get().then(r=>{
-        let content = r.data().messages[n];
-        con.innerHTML=`<main>
-        <script> var v=${JSON.stringify(content)}; v = JSON.parse(v);</script>
-        <div class="adbox">
-        <form onsubmit="return !1" class='message-form'>
-            <textarea name='text' rows='7' placeholder='Message replay'></textarea>
-            <button>Replay</button>
-        </form>
-        <div class="messageC flexC" ><div><h2>Message by: [ ${content.sendername}] ==> [ ${content.adtitle} ]</h2></div><div><h5>messageid: ${content.senderid}</h5></div><div><h2>${content.content}</h2></div><div class=''><h3>${content.date}</h3></div></div></div></main>`;
-    });
-}
-function makemessage(n,content){
-    return `<div class="messageC flexC" onclick="window.location.assign('./?page=replay&mid=${u().messageid}&n=${n}')"><div><h2>Message by: [ ${content.sendername}] ==> [ ${content.adtitle} ]</h2></div><div><h5>messageid: ${content.senderid}</h5></div><div><h2>${content.content}</h2></div><div class=''><h3>${content.date}</h3></div></div>`;
+if(Notification.permission!='granted')
+    Notification.requestPermission(s=>console.log("Notification Request"));
+notificationListener();
+function notificationListener() {
+    if(u()){
+    n = -1;
+    db.collection("SIM").doc(u().messageid)
+        .onSnapshot(function (doc) {
+            let ar = doc.data().messages.length;
+            if (n != -1) {
+                if (Notification.permission == 'granted')
+                    navigator.serviceWorker.getRegistration().then(r => {
+                        r.showNotification('New Message!', {
+                            body: 'You have new message',
+                            icon: './images/icons/icon-72x72.png',
+                            vibrate: [100, 50, 100],
+                            data: {
+                                primaryKey: 1
+                            }
+                        })
+                    });
+            } else n = ar.length
+        });}
 }
 
 // con = document.querySelector('.container')
@@ -353,7 +396,8 @@ function makemessage(n,content){
 //     .onSnapshot(function(doc) {
 //         var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
 // 		let ar = doc.data().messages;
-//         console.log(source, " data: ", ar.toString());
-// 		for(n;n<ar.length;n++)
+//        for(n;n<ar.length;n++)
 // 			con.innerHTML += ar[n]+'<br>';
 //     });
+
+// localStorage['no']=JSON.parse(localStorage['SIM']).messages.length;

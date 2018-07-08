@@ -309,6 +309,10 @@ button#submit{
 .messageC *{
   padding: 2px;
 }
+.fc{
+  display: flex;
+  justify-content: center !important;
+}
 /* Safari */
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }

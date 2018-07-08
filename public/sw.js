@@ -36,8 +36,7 @@ self.addEventListener('activate', evt => {
 })
 
 self.addEventListener('fetch', function (evt) {
-  console.log('Fetching\n' +(new URL(evt.request.url)).origin);
-    evt.respondWith((location.origin==(new URL(evt.request.url)).origin&&!navigator.onLine)?fromCache(evt.request):fromNetwork(evt.request));
+    evt.respondWith((location.origin==(new URL(evt.request.url)).origin)?fromCache(evt.request):fromNetwork(evt.request));
 });
 
 function precache() {
