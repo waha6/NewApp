@@ -1,0 +1,6 @@
+.box {
+    width: calc((100% - 48px)/ 4);
+    border: rgb(189, 189, 189) solid 1px;
+    border-top: none;
+    border-bottom: none;
+}

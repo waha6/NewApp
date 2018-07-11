@@ -1,1 +1,88 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Full Screen"><title>Extreme | Pakistan Market App</title><link rel="stylesheet" type="text/css" href="styles/style.css"><link rel="manifest" href="/manifest.json"><link rel="icon" type="image/png" href="images/icons/icon-72x72.png"></head><body><div id="err" class="sideerr hide"><a href="javascript:void(0)" class="closebtn" onclick="closeNav(this.parentNode)">&times;</a> <span id="errmessage"></span></div><header class="f50"><div class="f50"><div><span style="font-size:30px;cursor:pointer" onclick="openNav(document.querySelector('#nav'))" class="icon">&#9776;</span></div><div class="icon"><img src="images/icons/icon-144x144.png" height="40" onclick="window.location.replace('./')"></div></div><h2 style="margin:  4px;color: white;"> <b id="unpwa"></b> </h2><div><button id="submit" onclick="window.location.replace('./?page=submitad')" style="border:none">+</button></div></header><div id="searchbar"><input id="searchtext" type="text" placeholder="Search ..."><select id="searchcat" style="font-size:16px" id="searchcategory"><option value="all">All</option><option value="mobiles">Mobiles</option><option value="computers">Computers</option><option value="property">Property</option><option value="vehicles">Vehicles</option></select><button onclick="window.location.assign(`./?page=search&text=${document.querySelector('#searchtext').value}&cat=${document.querySelector('#searchcat').value}`)"><svg focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg></button></div><div id="nav" class="sidenav hide"><a href="javascript:void(0)" class="closebtn" onclick="closeNav(this.parentNode)">&times;</a> <a onclick="logout(this)" id="l-out" class="signin">Sign Out</a> <a href="./?page=login" id="l-in" class="signout">My Account</a> <a href="./?page=inbox" id="inbox" class="signin">Inbox</a> <a href="./?page=register" id="register" class="signout">Register</a></div><div class="container"><div class="man"><div class="loader"></div></div></div><script src="./scripts/firebase.js"></script><script type="text/javascript" src="scripts/app.js"></script><script>var page = locationVar("page") || "category"; pageLoad(page);document.querySelectorAll(".signin").forEach(r => {r.style.display=(u())?"block":"none";});document.querySelectorAll(".signout").forEach(r => {r.style.display=(!u())?"block":"none";});document.querySelector('#unpwa').innerHTML=(u())?user.uname:'';</script></body></html>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Full Screen">
+    <title>Extreme | Pakistan Market App</title>
+    <link rel="stylesheet" type="text/css" href="styles/style.css">
+    <link rel="stylesheet" href="./styles/style[small].css" media="only screen and (max-width:639px) and (min-width:460px)">
+    <link rel="stylesheet" href="./styles/style[medium].css" media="only screen and (max-width:991px) and (min-width:640px)">
+    <link rel="stylesheet" href="./styles/style[large].css" media="only screen and (max-width:1199px) and (min-width:992px)">
+    <link rel="stylesheet" href="./styles/style[exlarge].css" media="only screen and (min-width:1200px)">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="images/icons/icon-72x72.png">
+</head>
+
+<body>
+    <div id="err" class="sideerr hide">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav(this.parentNode)">&times;</a>
+        <span id="errmessage"></span>
+    </div>
+    <header class="f50">
+        <div class="f50">
+            <div>
+                <span style="font-size:30px;cursor:pointer" onclick="openNav(document.querySelector('#nav'))" class="icon">&#9776;</span>
+            </div>
+            <div class="icon">
+                <img src="images/icons/icon-144x144.png" height="40" onclick="window.location.replace('./')">
+            </div>
+        </div>
+        <div class="f50">
+            <h2 style="margin:5px 15px 5px 5px;color:#fff">
+                <b id="unpwa"></b>
+            </h2>
+            <button id="submit" onclick="window.location.replace('./?page=submitad')" style="border:none">+</button>
+        </div>
+    </header>
+    <div id="searchbar">
+        <input id="searchtext" type="text" placeholder="Search ...">
+        <select id="searchcat" style="font-size:16px" id="searchcategory">
+            <option value="all">All</option>
+            <option value="mobiles">Mobiles</option>
+            <option value="computers">Computers</option>
+            <option value="property">Property</option>
+            <option value="vehicles">Vehicles</option>
+        </select>
+        <button id="searchicon" onclick="window.location.assign(`./?page=search&text=${document.querySelector('#searchtext').value}&cat=${document.querySelector('#searchcat').value}`)">
+            <svg focusable="false" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#FFFFFF"></path>
+            </svg>
+        </button>
+    </div>
+    <div id="nav" class="sidenav hide">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav(this.parentNode)">&times;</a>
+        <a href="./">Homepage</a>
+        <a onclick="logout(this)" id="l-out" class="signin">Sign Out</a>
+        <a href="./?page=login" id="l-in" class="signout">Sign In</a>
+        <a href="./?page=inbox" id="inbox" class="signin">Inbox</a>
+        <a href="./?page=myads" id="myads" class="signin">My Ads</a>
+        <a href="./?page=myfavorite" id="myads" class="signin">My Favorite</a>
+        <a href="./?page=register" id="register" class="signout">Register</a>
+        <a href="javascripte:self.close();">Exit</a>
+    </div>
+    <div class="container">
+        <div class="man">
+            <div class="loader"></div>
+        </div>
+    </div>
+    <script src="./scripts/firebase.js"></script>
+    <script type="text/javascript" src="scripts/app.js"></script>
+    <script>
+        var page = locationVar("page") || "category";
+        pageLoad(page);
+        document.querySelectorAll(".signin").forEach(r => {
+            r.style.display = (u()) ? "block" : "none";
+        });
+        document.querySelectorAll(".signout").forEach(r => {
+            r.style.display = (!u()) ? "block" : "none";
+        });
+        document.querySelector('#unpwa').innerHTML = (u()) ? user.uname : '';
+    </script>
+</body>
+
+</html>
